@@ -38,8 +38,11 @@ jobs:
           command bash
           bash -c "uname -svrmo"
       - name: Tell Cygwin's git about this repository.
+        shell: "C:\\tools\\cygwin\\bin\\bash.exe -o igncr -eo pipefail {0}"
         run: |
-          dash -c "which git; /usr/bin/git config --system --add safe.directory /cygdrive/d/a/numpy/numpy"
+          pwd
+          # which git
+          # /usr/bin/git config --system --add safe.directory /cygdrive/d/a/numpy/numpy
       - name: Configure
         shell: "C:\\tools\\cygwin\\bin\\bash.exe -o igncr -euo pipefail {0}"
         run: |
