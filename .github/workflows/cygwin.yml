@@ -26,12 +26,13 @@ jobs:
           platform: x86_64
           install-dir: 'C:\tools\cygwin'
           packages: >-
-            gcc gcc-c++ gdb lzma glibc-devel libstdc++-devel openssl libssl-devel
-            libreadline-devel zlib-devel libffi-devel ibxz-devel
-            sqlite libsqlite3-devel libsqlite3 libuuid-devel libgdbm-devel gperf
+            gcc-core gcc-g++ gdb xz cygwin libstdc++6 openssl libssl-devel
+            libreadline-devel zlib-devel libffi-devel
+            sqlite3 libsqlite3-devel libsqlite3 libuuid-devel libgdbm-devel gperf
             libexpat-devel libgmp-devel python3-pip gcovr pkg-config
-            libbz2-dev liblzma-devel libncurses5-devel
-            lzma liblzma-devel tcl-tk-devel libmpdec-dev make
+            libbz2-devel liblzma-devel libncurses-devel
+            lzma liblzma-devel tcl-tk-devel make
+            libmpcdec-devel libmpc-devel
       - name: Set Windows PATH
         uses: egor-tensin/cleanup-path@f04bc953e6823bf491cc0bdcff959c630db1b458 # v4.0.1
         with:
@@ -49,7 +50,7 @@ jobs:
       - name: Configure
         shell: "C:\\tools\\cygwin\\bin\\bash.exe -o igncr -euo pipefail {0}"
         run: |
-          ./configure --with-pydebug --without-static-libpython --with-lto
+          ./configure --with-pydebug --without-static-libpython --with-lto --with-wheel-pkg-dir=/usr/share/python-wheels
       - name: Build
         shell: "C:\\tools\\cygwin\\bin\\bash.exe -o igncr -eo pipefail {0}"
         run: |
