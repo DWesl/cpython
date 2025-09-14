@@ -185,7 +185,7 @@ py_clock(time_module_state *state, PyTime_t *tp, _Py_clock_info_t *info)
 static int
 time_clockid_converter(PyObject *obj, clockid_t *p)
 {
-#ifdef _AIX
+#if defined(_AIX) || defined(__CYGWIN__)
     long long clk_id = PyLong_AsLongLong(obj);
 #elif defined(__DragonFly__) || defined(__CYGWIN__)
     long clk_id = PyLong_AsLong(obj);

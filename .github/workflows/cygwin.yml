@@ -1,0 +1,63 @@
+name: Test on Cygwin
+on:  "pull_request"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
+jobs:
+  cygwin_build_test:
+    runs-on: windows-latest
+    env:
+      CYGWIN_NOWINPATH: 1
+    steps:
+      - run: git config --global core.autocrlf input
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: recursive
+          fetch-tags: true
+          persist-credentials: false
+      - name: Install Cygwin
+        uses: egor-tensin/setup-cygwin@d2c752bab416d4b0662591bd366fc2686297c82d # v4
+        with:
+          platform: x86_64
+          install-dir: 'C:\tools\cygwin'
+          packages: >-
+            gcc-core gcc-g++ gdb xz cygwin libstdc++6 openssl libssl-devel
+            libreadline-devel zlib-devel libffi-devel
+            sqlite3 libsqlite3-devel libsqlite3 libuuid-devel libgdbm-devel gperf
+            libexpat-devel libgmp-devel python3-pip gcovr pkg-config
+            libbz2-devel liblzma-devel libncurses-devel
+            lzma liblzma-devel tcl-tk-devel make
+            libmpcdec-devel libmpc-devel
+      - name: Set Windows PATH
+        uses: egor-tensin/cleanup-path@f04bc953e6823bf491cc0bdcff959c630db1b458 # v4.0.1
+        with:
+          dirs: 'C:\tools\cygwin\bin;C:\tools\cygwin\lib\lapack'
+      - name: Verify that bash is Cygwin bash
+        run: |
+          command bash
+          bash -c "uname -svrmo"
+      - name: Tell Cygwin's git about this repository.
+        shell: "C:\\tools\\cygwin\\bin\\bash.exe -o igncr -eo pipefail {0}"
+        run: |
+          pwd
+          # which git
+          # /usr/bin/git config --system --add safe.directory /cygdrive/d/a/numpy/numpy
+      - name: Configure
+        shell: "C:\\tools\\cygwin\\bin\\bash.exe -o igncr -euo pipefail {0}"
+        run: |
+          ./configure --with-pydebug --without-static-libpython --with-lto --with-wheel-pkg-dir=/usr/share/python-wheels
+      - name: Build
+        shell: "C:\\tools\\cygwin\\bin\\bash.exe -o igncr -eo pipefail {0}"
+        run: |
+          make
+      - name:
+        shell: "C:\\tools\\cygwin\\bin\\bash.exe -o igncr -eo pipefail {0}"
+        timeout-minutes: 60
+        run: |
+          make test
+
